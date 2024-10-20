@@ -2,7 +2,7 @@
 
 **Request example:**
 
-`**POST** http://localhost:3001/v1/sendMail`
+**POST** `http://localhost:3001/v1/sendMail`
 
 *Body:*
 
