@@ -1,10 +1,10 @@
 # Mail-Server
 
-**Request example:**
+## Request example:
 
 **POST** `http://localhost:3001/v1/sendMail`
 
-*Body:*
+_Body:_
 
 ```
 {
