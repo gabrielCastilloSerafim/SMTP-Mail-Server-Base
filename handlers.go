@@ -6,6 +6,13 @@ import (
 	"net/http"
 )
 
+type SendMailRequestBody struct {
+	Provider  Provider `json:"provider"`
+	Addresses []string `json:"addresses"`
+	Subject   string   `json:"subject"`
+	Body      string   `json:"body"`
+}
+
 func sendMailHandler(w http.ResponseWriter, req *http.Request, mailSender *MailSender) {
 	// Get mail to send data from reuquest body
 	var sendMailData SendMailRequestBody
