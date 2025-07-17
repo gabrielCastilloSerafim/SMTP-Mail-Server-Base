@@ -10,10 +10,14 @@ _Body:_
 {
 "addresses": ["example@gmail.com"], // NonOptional, must contain at least one email
 "subject": "The mail subject", // Optional
-"body": "The mail body" // NonOptional
+"body": "The mail body", // NonOptional
+"isHTML": false, // Optional, defaults to false
 "provider": 0 // The provider that we want to send the email from must match internal server enum
 }
 ```
+
+# To send HTML you must send it as text and scaping the "" with \ like the following example:
+"<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Hello World</title><style>body{background-color:#121212;color:#e0e0e0;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;font-family:sans-serif;}</style></head><body><h1>Hello, World!</h1></body></html>"
 
 # How to add support for a nem Email:
 

@@ -28,10 +28,10 @@ func NewMailSender() *MailSender {
 	}
 }
 
-func (ms *MailSender) SendMail(provider Provider, toAddresses []string, subject string, body string) error {
+func (ms *MailSender) SendMail(requestData SendMailRequestData) error {
 	var providerConfigMatch *MailProviderConfig
 	for _, providerConfig := range *ms.MailProviderConfigs {
-		if providerConfig.Provider == provider {
+		if providerConfig.Provider == requestData.Provider {
 			providerConfigMatch = &providerConfig
 			break
 		}
@@ -40,10 +40,16 @@ func (ms *MailSender) SendMail(provider Provider, toAddresses []string, subject 
 		panic("No provider config found")
 	}
 	var msg []byte
-	if subject != "" {
-		msg = []byte("Subject: " + subject + "\r\n" + "\r\n" + body)
+	if requestData.IsHTML {
+		msg = []byte("Subject: " + requestData.Subject + "\r\n" +
+			"Content-Type: text/html; charset=UTF-8\r\n" +
+			"\r\n" + requestData.Body)
 	} else {
-		msg = []byte(body)
+		if requestData.Subject != "" {
+			msg = []byte("Subject: " + requestData.Subject + "\r\n" + "\r\n" + requestData.Body)
+		} else {
+			msg = []byte(requestData.Body)
+		}
 	}
-	return smtp.SendMail(providerConfigMatch.Host+":"+providerConfigMatch.HostPort, *providerConfigMatch.Auth, providerConfigMatch.FromMail, toAddresses, msg)
+	return smtp.SendMail(providerConfigMatch.Host+":"+providerConfigMatch.HostPort, *providerConfigMatch.Auth, providerConfigMatch.FromMail, requestData.Addresses, msg)
 }
