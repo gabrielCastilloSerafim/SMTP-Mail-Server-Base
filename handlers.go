@@ -23,7 +23,7 @@ func sendMailHandler(w http.ResponseWriter, req *http.Request, mailSender *MailS
 		return
 	}
 	// Send mail
-	err = mailSender.sendMail(sendMailData.Addresses, sendMailData.Subject, sendMailData.Body)
+	err = mailSender.SendMail(sendMailData.Provider, sendMailData.Addresses, sendMailData.Subject, sendMailData.Body)
 	if err != nil {
 		log.Printf("💥 Failed to send with addresses: %v, and error: %s", sendMailData.Addresses, err.Error())
 		w.WriteHeader(http.StatusExpectationFailed)

@@ -2,39 +2,48 @@ package main
 
 import (
 	"net/smtp"
-	"os"
 )
 
 type MailSender struct {
+	MailProviderConfigs *[]MailProviderConfig
+}
+
+type MailProviderConfig struct {
+	Provider Provider
 	Auth     *smtp.Auth
 	Host     string
 	HostPort string
 	FromMail string
 }
 
-func newMailSender() *MailSender {
-	host := os.Getenv("HOST")
-	hostPort := os.Getenv("HOST_PORT")
-	fromMail := os.Getenv("FROM_MAIL")
-	googleAppPass := os.Getenv("GOOGLE_APP_PASSWORD")
-	if host == "" || hostPort == "" || fromMail == "" || googleAppPass == "" {
-		panic("Failed to load env data")
+func NewMailSender() *MailSender {
+
+	var mailProviderConfigs []MailProviderConfig
+	for _, provider := range AllProviders() {
+		mailProviderConfigs = append(mailProviderConfigs, provider.Config())
 	}
-	auth := smtp.PlainAuth("", fromMail, googleAppPass, host)
+
 	return &MailSender{
-		Auth:     &auth,
-		Host:     host,
-		HostPort: hostPort,
-		FromMail: fromMail,
+		MailProviderConfigs: &mailProviderConfigs,
 	}
 }
 
-func (ms *MailSender) sendMail(toMailAddresses []string, subject string, body string) error {
+func (ms *MailSender) SendMail(provider Provider, toAddresses []string, subject string, body string) error {
+	var providerConfigMatch *MailProviderConfig
+	for _, providerConfig := range *ms.MailProviderConfigs {
+		if providerConfig.Provider == provider {
+			providerConfigMatch = &providerConfig
+			break
+		}
+	}
+	if providerConfigMatch == nil {
+		panic("No provider config found")
+	}
 	var msg []byte
 	if subject != "" {
 		msg = []byte("Subject: " + subject + "\r\n" + "\r\n" + body)
 	} else {
 		msg = []byte(body)
 	}
-	return smtp.SendMail(ms.Host+":"+ms.HostPort, *ms.Auth, ms.FromMail, toMailAddresses, msg)
+	return smtp.SendMail(providerConfigMatch.Host+":"+providerConfigMatch.HostPort, *providerConfigMatch.Auth, providerConfigMatch.FromMail, toAddresses, msg)
 }
