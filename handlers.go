@@ -15,6 +15,12 @@ type SendMailRequestData struct {
 }
 
 func sendMailHandler(w http.ResponseWriter, req *http.Request, mailSender *MailSender) {
+	// Basic Auth check
+	apiKey := req.Header.Get("apiKey")
+	if apiKey != "1520AE6F-E377-41AE-BD90-9A4191F2F8CA" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 	// Get mail to send data from reuquest body
 	var sendMailData SendMailRequestData
 	err := json.NewDecoder(req.Body).Decode(&sendMailData)
